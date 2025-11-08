@@ -1,53 +1,98 @@
-name: Flutter Build
+name: Build and Release APK
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch: # Manual trigger
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v3
+      # 2. Setup Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: "17"
 
-      - uses: subosito/flutter-action@v2
+      # 3. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.27.1"
           channel: "stable"
           cache: true
 
-      - name: Cache Flutter packages
-        uses: actions/cache@v3
+      # 4. Flutter Doctor
+      - name: Run Flutter Doctor
+        run: flutter doctor -v
+
+      # 5. Get Dependencies
+      - name: Get dependencies
+        run: flutter pub get
+
+      # 6. Analyze code
+      - name: Analyze code
+        run: flutter analyze
+
+      # 7. Run tests (optional)
+      # - name: Run tests
+      #   run: flutter test
+
+      # 8. Build APK (Release)
+      - name: Build Release APK
+        run: |
+          flutter build apk --release \
+            --dart-define=PACKAGE_NAME=dev.diyor.loancalculator \
+            --dart-define=APP_NAME="Avto Qarz Kalkulyator"
+
+      # 9. Build App Bundle (for Play Store)
+      - name: Build App Bundle
+        run: |
+          flutter build appbundle --release \
+            --dart-define=PACKAGE_NAME=dev.diyor.loancalculator \
+            --dart-define=APP_NAME="Avto Qarz Kalkulyator"
+
+      # 10. Upload APK Artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          path: |
-            ~/.pub-cache
-          key: flutter-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            flutter-pub-
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
 
-      - name: Cache Gradle
-        uses: actions/cache@v3
+      # 11. Upload App Bundle Artifact
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v4
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            android/.gradle
-          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-
+          name: release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
 
-      - run: flutter pub get
+      # 12. Create Release (optional - agar tag push qilsangiz)
+      # - name: Create Release
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: |
+      #       build/app/outputs/flutter-apk/app-release.apk
+      #       build/app/outputs/bundle/release/app-release.aab
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: flutter build apk --release --split-per-abi
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: app-release
-          path: build/app/outputs/apk/release/*.apk
+      # 13. Build summary
+      - name: Build Summary
+        run: |
+          echo "✅ Build completed successfully!"
+          echo "📱 APK: build/app/outputs/flutter-apk/app-release.apk"
+          echo "📦 AAB: build/app/outputs/bundle/release/app-release.aab"
+          ls -lh build/app/outputs/flutter-apk/
+          ls -lh build/app/outputs/bundle/release/
