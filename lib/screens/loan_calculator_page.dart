@@ -132,6 +132,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
 
     // Natijalar qismiga scroll qilish
     Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
       Scrollable.ensureVisible(
         context,
         duration: const Duration(milliseconds: 500),
@@ -171,7 +172,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               Colors.white,
             ],
           ),
@@ -450,9 +451,9 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -523,7 +524,10 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(

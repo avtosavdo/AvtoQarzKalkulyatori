@@ -194,11 +194,11 @@ class _SplashScreenState extends State<SplashScreen>
       height: size.width * 0.5,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 30,
             offset: const Offset(0, 10),
           ),
@@ -222,11 +222,11 @@ class _SplashScreenState extends State<SplashScreen>
       height: size.width * 0.5,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 30,
             offset: const Offset(0, 10),
           ),
@@ -253,7 +253,7 @@ class _SplashScreenState extends State<SplashScreen>
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 30,
             offset: const Offset(0, 10),
           ),
@@ -297,7 +297,7 @@ class _SplashScreenState extends State<SplashScreen>
       style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         letterSpacing: 0.5,
       ),
     );
@@ -311,7 +311,7 @@ class _SplashScreenState extends State<SplashScreen>
       child: CircularProgressIndicator(
         strokeWidth: 3,
         valueColor: AlwaysStoppedAnimation<Color>(
-          Colors.white.withOpacity(0.8),
+          Colors.white.withValues(alpha: 0.8),
         ),
       ),
     );
@@ -326,7 +326,7 @@ class _SplashScreenState extends State<SplashScreen>
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             letterSpacing: 2,
           ),
         ),
@@ -336,7 +336,7 @@ class _SplashScreenState extends State<SplashScreen>
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w400,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ],
