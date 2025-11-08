@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loancalculator/screens/loan_calculator_page.dart';
 import 'dart:async';
 import 'package:lottie/lottie.dart';
 // import 'package:flutter_svg/flutter_svg.dart'; // Agar SVG ishlatmoqchi bo'lsangiz
 
 /// Professional Splash Screen with animation
-/// 
+///
 /// Features:
 /// - Lottie animation support
 /// - SVG support
@@ -339,24 +340,6 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ),
       ],
-    );
-  }
-}
-
-// Placeholder for LoanCalculatorPage
-// Bu faylni alohida screens/loan_calculator_page.dart ga ko'chirishingiz kerak
-class LoanCalculatorPage extends StatelessWidget {
-  const LoanCalculatorPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Loan Calculator'),
-      ),
-      body: const Center(
-        child: Text('Calculator Page - Replace with your existing code'),
-      ),
     );
   }
 }
