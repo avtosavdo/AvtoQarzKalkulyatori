@@ -32,7 +32,7 @@ Avtomobil sotib olish uchun kredit to'lovlarini hisoblash uchun Flutter mobil il
 
 - **Framework:** Flutter 3.x
 - **Til:** Dart
-- **Package:** uz.autograph.loancalculator
+- **Package:** dev.diyor.loancalculator
 - **Platforma:** Android, iOS
 - **Hisoblash formulasi:** Annuity formula
 
