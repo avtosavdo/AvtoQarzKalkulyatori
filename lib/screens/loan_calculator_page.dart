@@ -310,6 +310,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
                   const SizedBox(height: 24),
                   _buildPaymentSchedule(),
                 ],
+                const SizedBox(height: 50),
               ],
             ),
           ),
