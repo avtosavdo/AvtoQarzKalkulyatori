@@ -648,7 +648,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
 
             const SizedBox(height: 16),
 
-            // Kredit muddati
+            // Kredit muddati.
             TextFormField(
               controller: _loanTermController,
               keyboardType: TextInputType.number,
