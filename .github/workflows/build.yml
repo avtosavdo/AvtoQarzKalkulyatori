@@ -52,14 +52,14 @@ jobs:
         run: |
           flutter build apk --release \
             --dart-define=PACKAGE_NAME=dev.diyor.loancalculator \
-            --dart-define=APP_NAME="Avto Qarz Kalkulyator"
+            --dart-define=APP_NAME="Avto Qarz kalkulator"
 
       # 9. Build App Bundle (for Play Store)
       - name: Build App Bundle
         run: |
           flutter build appbundle --release \
             --dart-define=PACKAGE_NAME=dev.diyor.loancalculator \
-            --dart-define=APP_NAME="Avto Qarz Kalkulyator"
+            --dart-define=APP_NAME="Avto Qarz kalkulator"
 
       # 10. Upload APK Artifact
       - name: Upload APK

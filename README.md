@@ -1,24 +1,27 @@
-# Avto Qarz Kalkulyatori
+# Avto Qarz kalkulatori
 
 Avtomobil sotib olish uchun kredit va rassrochka to'lovlarini hisoblash uchun Flutter mobil ilovasi.
 
 ## 📱 Ilova haqida
 
-**Avto Qarz Kalkulyatori** - bu foydalanuvchilarga avtomobil sotib olish uchun kredit va rassrochka to'lovlarini aniq hisoblash imkonini beruvchi mobil ilova.
+**Avto Qarz kalkulatori** - bu foydalanuvchilarga avtomobil sotib olish uchun kredit va rassrochka to'lovlarini aniq hisoblash imkonini beruvchi mobil ilova.
 
 ### Kredit turlari:
+
 1. **Bank krediti** - Annuity formulasi asosida professional bank kreditlarini hisoblaydi
 2. **Rassrochka** - Qora bozor rassrochka to'lovlarini (simple markup) hisoblaydi
 
 ## ✨ Asosiy funksiyalar
 
 ### 🏦 Bank Krediti:
+
 - Professional Annuity formula
 - Oylik to'lov qoldiq balansdan hisoblanadi
 - Foiz har oy kamayib boradi
 - Asosiy qarz har oy oshib boradi
 
 ### 🛒 Rassrochka (Qora bozor):
+
 - Simple markup calculation
 - 12 oygacha: 25% ustama
 - 13+ oy: 30% ustama
@@ -26,12 +29,14 @@ Avtomobil sotib olish uchun kredit va rassrochka to'lovlarini hisoblash uchun Fl
 - Tez va sodda
 
 ### Kirish maydonlari:
+
 - 🚗 **Avtomobil narxi** - avtomobilning to'liq narxi (so'm)
 - 💰 **Dastlabki to'lov** - boshlang'ich to'lov miqdori (so'm)
 - 📊 **Foiz/Ustama stavka** - kredit foiz yoki rassrochka ustama (%)
 - 📅 **Kredit muddati** - to'lov muddati (oy)
 
 ### Hisoblash natijalari:
+
 - 📆 **Oylik to'lov** - har oy to'lanadigan summa
 - 💵 **Jami to'lov** - butun muddat davomida to'lanadigan umumiy summa
 - 📈 **Jami foiz/ustama** - qo'shimcha to'lanadigan miqdor
@@ -70,6 +75,7 @@ dependencies:
 ## 🧮 Hisoblash Formulalari
 
 ### Bank Krediti (Annuity):
+
 ```
 M = P × (r × (1 + r)^n) / ((1 + r)^n - 1)
 
@@ -80,6 +86,7 @@ n = Kredit muddati (oy)
 ```
 
 ### Rassrochka (Simple Markup):
+
 ```
 Jami = Kredit summasi × (1 + Ustama%)
 Oylik = Jami / Oylar
@@ -90,6 +97,7 @@ Ustama: 25% (≤12 oy), 30% (>12 oy)
 ## 🚀 O'rnatish va ishga tushirish
 
 ### Talablar:
+
 - Flutter SDK (3.27.1+)
 - Dart SDK (3.0.0+)
 - Android Studio / VS Code
@@ -98,11 +106,13 @@ Ustama: 25% (≤12 oy), 30% (>12 oy)
 ### Loyihani ishga tushirish:
 
 1. Dependencies'larni o'rnatish:
+
 ```bash
 flutter pub get
 ```
 
 2. Ilovani ishga tushirish:
+
 ```bash
 flutter run
 ```
@@ -110,16 +120,19 @@ flutter run
 ## 📦 Build qilish
 
 ### Android uchun APK:
+
 ```bash
 flutter build apk --release
 ```
 
 ### Android uchun App Bundle:
+
 ```bash
 flutter build appbundle --release
 ```
 
 ### GitHub Actions (Recommended):
+
 ```bash
 git push origin main
 # Automatic build via GitHub Actions
@@ -129,21 +142,25 @@ git push origin main
 ## 💡 Foydalanish
 
 ### 1. Kredit turini tanlang:
+
 - Bank krediti (professional, rasmiy)
 - Rassrochka (qora bozor, tez)
 
 ### 2. Ma'lumotlarni kiriting:
+
 - Avtomobil narxi
 - Dastlabki to'lov
 - Foiz/Ustama
 - Muddat (oy)
 
 ### 3. Hisoblang:
+
 - "Hisoblash" tugmasini bosing
 - Natijalarni ko'ring
 - To'lov jadvalini tekshiring
 
 ### 4. Taqqoslang:
+
 - Ikki kredit turini ham hisoblang
 - Qaysi biri foydali ekanini aniqlang
 - To'g'ri qaror qabul qiling
@@ -152,21 +169,21 @@ git push origin main
 
 ### 200 million so'm avtomobil, 50 million boshlang'ich, 36 oy:
 
-| Parametr | Bank (18%) | Rassrochka (30%) | Farq |
-|----------|------------|------------------|------|
-| Oylik | 5,421,779 | 5,416,667 | -5,112 |
-| Jami | 195,184,044 | 195,000,000 | -184,044 |
-| Qo'shimcha | 45,184,044 | 45,000,000 | -184,044 |
+| Parametr   | Bank (18%)  | Rassrochka (30%) | Farq     |
+| ---------- | ----------- | ---------------- | -------- |
+| Oylik      | 5,421,779   | 5,416,667        | -5,112   |
+| Jami       | 195,184,044 | 195,000,000      | -184,044 |
+| Qo'shimcha | 45,184,044  | 45,000,000       | -184,044 |
 
 **Natija:** 3 yilga deyarli bir xil!
 
 ### 100 million so'm qoldiq, 12 oy:
 
-| Parametr | Bank (18%) | Rassrochka (25%) | Farq |
-|----------|------------|------------------|------|
-| Oylik | 9,168,387 | 10,416,667 | +1,248,280 |
-| Jami | 110,020,644 | 125,000,000 | +14,979,356 |
-| Qo'shimcha | 10,020,644 | 25,000,000 | +14,979,356 |
+| Parametr   | Bank (18%)  | Rassrochka (25%) | Farq        |
+| ---------- | ----------- | ---------------- | ----------- |
+| Oylik      | 9,168,387   | 10,416,667       | +1,248,280  |
+| Jami       | 110,020,644 | 125,000,000      | +14,979,356 |
+| Qo'shimcha | 10,020,644  | 25,000,000       | +14,979,356 |
 
 **Natija:** Bank krediti 15 million arzonroq!
 
@@ -210,6 +227,7 @@ Bu ilova MIT litsenziyasi ostida tarqatiladi.
 ## 👨‍💻 Muallif
 
 **AUTOGRAPH AUTOMOTIVE GROUP**
+
 - Website: uz.autograph
 - Email: info@autograph.uz
 - Phone: +998 XX XXX XX XX
@@ -230,6 +248,7 @@ Savollar yoki takliflar bo'lsa, iltimos bog'laning.
 ## 📝 Changelog
 
 ### Version 1.0.0 (2024-11-XX)
+
 - ✅ Initial release
 - ✅ Bank credit calculator
 - ✅ Installment/Rassrochka calculator

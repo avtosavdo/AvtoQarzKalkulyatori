@@ -271,7 +271,7 @@ class _SplashScreenState extends State<SplashScreen>
   /// App Name
   Widget _buildAppName() {
     return const Text(
-      'Avto Qarz Kalkulyatori',
+      'Avto Qarz kalkulatori',
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 28,
@@ -321,15 +321,15 @@ class _SplashScreenState extends State<SplashScreen>
   Widget _buildCompanyName() {
     return Column(
       children: [
-        Text(
-          'AUTOGRAPH AUTOMOTIVE GROUP',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Colors.white.withValues(alpha: 0.7),
-            letterSpacing: 2,
-          ),
-        ),
+        // Text(
+        //   'AUTOGRAPH AUTOMOTIVE GROUP',
+        //   style: TextStyle(
+        //     fontSize: 12,
+        //     fontWeight: FontWeight.w600,
+        //     color: Colors.white.withValues(alpha: 0.7),
+        //     letterSpacing: 2,
+        //   ),
+        // ),
         const SizedBox(height: 4),
         Text(
           'v1.0.0',

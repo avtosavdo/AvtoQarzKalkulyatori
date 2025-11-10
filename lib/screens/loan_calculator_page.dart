@@ -258,7 +258,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Avto Qarz Kalkulyatori',
+          'Avto Qarz kalkulatori',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

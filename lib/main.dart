@@ -31,7 +31,7 @@ class AvtoQarzApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // App Configuration
-      title: 'Avto Qarz Kalkulyatori',
+      title: 'Avto Qarz kalkulatori',
       debugShowCheckedModeBanner: false,
 
       // Theme Configuration
