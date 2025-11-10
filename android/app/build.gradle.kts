@@ -40,11 +40,30 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String
+        if (keystorePropertiesFile.exists()) {
+            val keyAlias = keystoreProperties.getProperty("keyAlias")
+            val keyPassword = keystoreProperties.getProperty("keyPassword")
+            val storeFile = keystoreProperties.getProperty("storeFile")
+            val storePassword = keystoreProperties.getProperty("storePassword")
+            
+            if (keyAlias != null && keyPassword != null && storeFile != null && storePassword != null) {
+                create("release") {
+                    this.keyAlias = keyAlias
+                    this.keyPassword = keyPassword
+                    // Nisbiy path ni to'g'ri qayta ishlash
+                    val storeFilePath = if (storeFile.contains(":")) {
+                        // Windows absolute path - nisbiy path ga o'zgartirish
+                        storeFile.substringAfterLast("\\").let { fileName ->
+                            rootProject.file("app/$fileName")
+                        }
+                    } else {
+                        // Nisbiy path (android/ papkasidan)
+                        rootProject.file(storeFile)
+                    }
+                    this.storeFile = storeFilePath
+                    this.storePassword = storePassword
+                }
+            }
         }
     }
     buildTypes {
@@ -53,7 +72,9 @@ android {
             // Signing with the debug keys for now,
             // so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
-            signingConfig = signingConfigs.getByName("release")
+            if (keystorePropertiesFile.exists() && signingConfigs.findByName("release") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 }
