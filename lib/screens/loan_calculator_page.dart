@@ -6,7 +6,8 @@ import 'dart:math';
 ///
 /// Features:
 /// - Bank Credit (Annuity formula)
-/// - Installment/Rassrochka (Simple markup)
+/// - Installment/Rassrochka (Yearly markup: 1yr=25%, 2yr=50%, 3yr=75%)
+/// - Currency selector (UZS/USD)
 /// - Comparison view
 class LoanCalculatorPage extends StatefulWidget {
   const LoanCalculatorPage({super.key});
@@ -28,6 +29,9 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
   // Credit type selection
   CreditType _selectedCreditType = CreditType.bank;
 
+  // Currency selection
+  CurrencyType _selectedCurrency = CurrencyType.uzs;
+
   // Results
   double _monthlyPayment = 0;
   double _totalPayment = 0;
@@ -42,6 +46,16 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
     _interestRateController.dispose();
     _loanTermController.dispose();
     super.dispose();
+  }
+
+  /// Get currency symbol
+  String get currencySymbol {
+    return _selectedCurrency == CurrencyType.uzs ? 'so\'m' : '\$';
+  }
+
+  /// Get currency name
+  String get currencyName {
+    return _selectedCurrency == CurrencyType.uzs ? 'So\'m' : 'Dollar';
   }
 
   /// Raqamlarni formatlash: 1000000 -> "1 000 000"
@@ -65,6 +79,27 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
   /// Stringni raqamga o'girish: "1 000 000" -> 1000000
   double parseFormattedNumber(String text) {
     return double.tryParse(text.replaceAll(' ', '')) ?? 0;
+  }
+
+  /// RASSROCHKA USTAMA FOIZINI ANIQLASH
+  /// 1-12 oy: 25% (1 yil)
+  /// 13-24 oy: 50% (2 yil)
+  /// 25-36 oy: 75% (3 yil)
+  /// 37-48 oy: 100% (4 yil)
+  double getInstallmentMarkupRate(int months) {
+    if (months <= 12) {
+      return 25.0; // 1 yil
+    } else if (months <= 24) {
+      return 50.0; // 2 yil
+    } else if (months <= 36) {
+      return 75.0; // 3 yil
+    } else if (months <= 48) {
+      return 100.0; // 4 yil
+    } else {
+      // 48+ oy uchun har yil uchun 25% qo'shamiz
+      int years = (months / 12).ceil();
+      return years * 25.0;
+    }
   }
 
   /// BANK KREDITI - Annuity formula
@@ -126,7 +161,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
     _scrollToResults();
   }
 
-  /// RASSROCHKA - Simple markup calculation
+  /// RASSROCHKA - Yearly markup calculation
   void calculateInstallment() {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -134,18 +169,16 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
 
     double carPrice = parseFormattedNumber(_carPriceController.text);
     double downPayment = parseFormattedNumber(_downPaymentController.text);
-    double markupRate = double.parse(_interestRateController.text);
     int loanTerm = int.parse(_loanTermController.text);
 
     // Kredit summasi
     double loanAmount = carPrice - downPayment;
 
-    // SIMPLE MARKUP hisoblash
-    // Agar 1 yilgacha bo'lsa 25%, 1 yildan ko'p bo'lsa 30%
-    double actualMarkup = markupRate; // User kiritgan foizni ishlatamiz
+    // Yillar bo'yicha ustama foizni aniqlash
+    double markupRate = getInstallmentMarkupRate(loanTerm);
 
-    // Jami ustama
-    double totalMarkup = loanAmount * (actualMarkup / 100);
+    // Jami ustama (asosiy summadan)
+    double totalMarkup = loanAmount * (markupRate / 100);
 
     // Jami to'lov
     double totalPayment = loanAmount + totalMarkup;
@@ -253,6 +286,11 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Currency selector
+                _buildCurrencySelector(),
+
+                const SizedBox(height: 16),
+
                 // Credit type selector
                 _buildCreditTypeSelector(),
 
@@ -277,6 +315,118 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Currency selector
+  Widget _buildCurrencySelector() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Valyuta turini tanlang',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildCurrencyOption(
+                    type: CurrencyType.uzs,
+                    icon: Icons.currency_exchange,
+                    title: 'O\'zbek so\'mi',
+                    subtitle: 'UZS',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildCurrencyOption(
+                    type: CurrencyType.usd,
+                    icon: Icons.attach_money,
+                    title: 'AQSH dollari',
+                    subtitle: 'USD',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Currency option widget
+  Widget _buildCurrencyOption({
+    required CurrencyType type,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    final isSelected = _selectedCurrency == type;
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedCurrency = type;
+          _showResults = false; // Natijalarni yashirish
+        });
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+              : Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.grey[600],
+              size: 32,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
@@ -417,7 +567,9 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             _buildNumberInputField(
               controller: _carPriceController,
               label: 'Avtomobil narxi',
-              hint: 'Masalan: 200 000 000',
+              hint: _selectedCurrency == CurrencyType.uzs
+                  ? 'Masalan: 200 000 000'
+                  : 'Masalan: 15 000',
               icon: Icons.directions_car,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -437,7 +589,9 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             _buildNumberInputField(
               controller: _downPaymentController,
               label: 'Dastlabki to\'lov',
-              hint: 'Masalan: 50 000 000',
+              hint: _selectedCurrency == CurrencyType.uzs
+                  ? 'Masalan: 50 000 000'
+                  : 'Masalan: 5 000',
               icon: Icons.payments,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -459,43 +613,78 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
 
             const SizedBox(height: 16),
 
-            // Foiz/Ustama stavka
-            TextFormField(
-              controller: _interestRateController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              decoration: InputDecoration(
-                labelText: _selectedCreditType == CreditType.bank
-                    ? 'Yillik foiz stavka (%)'
-                    : 'Ustama foiz (%)',
-                hintText: _selectedCreditType == CreditType.bank
-                    ? 'Masalan: 18'
-                    : 'Masalan: 25 yoki 30',
-                prefixIcon: const Icon(Icons.percent),
-                suffixText: '%',
-                helperText: _selectedCreditType == CreditType.installment
-                    ? '12 oygacha: 25%, 13+ oy: 30%'
-                    : null,
+            // Foiz stavka (faqat bank krediti uchun)
+            if (_selectedCreditType == CreditType.bank)
+              TextFormField(
+                controller: _interestRateController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Yillik foiz stavka (%)',
+                  hintText: 'Masalan: 18',
+                  prefixIcon: Icon(Icons.percent),
+                  suffixText: '%',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Iltimos, foiz stavkani kiriting';
+                  }
+                  double rate = double.tryParse(value) ?? -1;
+                  if (rate < 0) {
+                    return 'Foiz 0 dan kichik bo\'lmasligi kerak';
+                  }
+                  if (rate > 100) {
+                    return 'Foiz 100 dan oshmasligi kerak';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return _selectedCreditType == CreditType.bank
-                      ? 'Iltimos, foiz stavkani kiriting'
-                      : 'Iltimos, ustama foizni kiriting';
-                }
-                double rate = double.tryParse(value) ?? -1;
-                if (rate < 0) {
-                  return 'Foiz 0 dan kichik bo\'lmasligi kerak';
-                }
-                if (rate > 100) {
-                  return 'Foiz 100 dan oshmasligi kerak';
-                }
-                return null;
-              },
-            ),
+
+            // Info message for installment
+            if (_selectedCreditType == CreditType.installment)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.blue[700]),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Rassrochka ustama foizlari:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue[900],
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '• 1-12 oy: 25% ustama\n'
+                            '• 13-24 oy: 50% ustama\n'
+                            '• 25-36 oy: 75% ustama\n'
+                            '• 37-48 oy: 100% ustama',
+                            style: TextStyle(
+                              color: Colors.blue[700],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
             const SizedBox(height: 16),
 
@@ -549,7 +738,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(icon),
-        suffixText: 'so\'m',
+        suffixText: currencySymbol,
       ),
       validator: validator,
     );
@@ -620,7 +809,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             _buildResultItem(
               icon: Icons.calendar_month,
               label: 'Oylik to\'lov',
-              value: '${formatNumber(_monthlyPayment)} so\'m',
+              value: '${formatNumber(_monthlyPayment)} $currencySymbol',
               color: Colors.blue,
               isMain: true,
             ),
@@ -631,7 +820,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             _buildResultItem(
               icon: Icons.account_balance_wallet,
               label: 'Jami to\'lanadigan summa',
-              value: '${formatNumber(_totalPayment)} so\'m',
+              value: '${formatNumber(_totalPayment)} $currencySymbol',
               color: Colors.green,
             ),
 
@@ -643,9 +832,38 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
               label: _selectedCreditType == CreditType.bank
                   ? 'Jami to\'lanadigan foiz'
                   : 'Jami ustama',
-              value: '${formatNumber(_totalInterest)} so\'m',
+              value: '${formatNumber(_totalInterest)} $currencySymbol',
               color: Colors.orange,
             ),
+
+            // Rassrochka uchun qo'shimcha info
+            if (_selectedCreditType == CreditType.installment) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.purple[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.purple[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.purple[700]),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Ustama foiz: ${getInstallmentMarkupRate(int.parse(_loanTermController.text))}%',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple[900],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -831,6 +1049,12 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
 enum CreditType {
   bank, // Bank krediti (Annuity)
   installment, // Rassrochka (Simple markup)
+}
+
+/// Currency type enum
+enum CurrencyType {
+  uzs, // O'zbek so'mi
+  usd, // AQSH dollari
 }
 
 /// To'lov jadvali modeli
