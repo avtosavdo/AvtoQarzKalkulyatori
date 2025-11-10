@@ -169,13 +169,11 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
 
     double carPrice = parseFormattedNumber(_carPriceController.text);
     double downPayment = parseFormattedNumber(_downPaymentController.text);
+    double markupRate = double.parse(_interestRateController.text);
     int loanTerm = int.parse(_loanTermController.text);
 
     // Kredit summasi
     double loanAmount = carPrice - downPayment;
-
-    // Yillar bo'yicha ustama foizni aniqlash
-    double markupRate = getInstallmentMarkupRate(loanTerm);
 
     // Jami ustama (asosiy summadan)
     double totalMarkup = loanAmount * (markupRate / 100);
@@ -613,78 +611,40 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
 
             const SizedBox(height: 16),
 
-            // Foiz stavka (faqat bank krediti uchun)
-            if (_selectedCreditType == CreditType.bank)
-              TextFormField(
-                controller: _interestRateController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'Yillik foiz stavka (%)',
-                  hintText: 'Masalan: 18',
-                  prefixIcon: Icon(Icons.percent),
-                  suffixText: '%',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Iltimos, foiz stavkani kiriting';
-                  }
-                  double rate = double.tryParse(value) ?? -1;
-                  if (rate < 0) {
-                    return 'Foiz 0 dan kichik bo\'lmasligi kerak';
-                  }
-                  if (rate > 100) {
-                    return 'Foiz 100 dan oshmasligi kerak';
-                  }
-                  return null;
-                },
+            // Foiz/Ustama stavka
+            TextFormField(
+              controller: _interestRateController,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+              ],
+              decoration: InputDecoration(
+                labelText: _selectedCreditType == CreditType.bank
+                    ? 'Yillik foiz stavka (%)'
+                    : 'Ustama foiz (%)',
+                hintText: _selectedCreditType == CreditType.bank
+                    ? 'Masalan: 18'
+                    : 'Masalan: 25',
+                prefixIcon: const Icon(Icons.percent),
+                suffixText: '%',
               ),
-
-            // Info message for installment
-            if (_selectedCreditType == CreditType.installment)
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue[200]!),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.blue[700]),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Rassrochka ustama foizlari:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue[900],
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '• 1-12 oy: 25% ustama\n'
-                            '• 13-24 oy: 50% ustama\n'
-                            '• 25-36 oy: 75% ustama\n'
-                            '• 37-48 oy: 100% ustama',
-                            style: TextStyle(
-                              color: Colors.blue[700],
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return _selectedCreditType == CreditType.bank
+                      ? 'Iltimos, foiz stavkani kiriting'
+                      : 'Iltimos, ustama foizni kiriting';
+                }
+                double rate = double.tryParse(value) ?? -1;
+                if (rate < 0) {
+                  return 'Foiz 0 dan kichik bo\'lmasligi kerak';
+                }
+                if (rate > 100) {
+                  return 'Foiz 100 dan oshmasligi kerak';
+                }
+                return null;
+              },
+            ),
 
             const SizedBox(height: 16),
 
@@ -852,7 +812,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Ustama foiz: ${getInstallmentMarkupRate(int.parse(_loanTermController.text))}%',
+                        'Ustama foiz: ${_interestRateController.text}%',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.purple[900],
